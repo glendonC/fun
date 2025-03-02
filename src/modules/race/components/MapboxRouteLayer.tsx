@@ -106,10 +106,10 @@ const MapboxRouteLayer: React.FC<MapboxRouteLayerProps> = ({
       });
       
       // Adjust opacity and width based on whether this is the player's or opponent's route
-      const mainOpacity = isOpponent ? 0.5 : 0.9;
-      const glowOpacity = isOpponent ? 0.2 : 0.4;
-      const lineWidth = isOpponent ? 4 : 6;
-      const glowWidth = isOpponent ? 8 : 12;
+      const mainOpacity = isOpponent ? 0.7 : 0.9;
+      const glowOpacity = isOpponent ? 0.3 : 0.4;
+      const lineWidth = isOpponent ? 5 : 6;
+      const glowWidth = isOpponent ? 10 : 12;
       
       // Add route layer - main path
       map.addLayer({
@@ -123,7 +123,10 @@ const MapboxRouteLayer: React.FC<MapboxRouteLayerProps> = ({
         paint: {
           'line-color': isRat ? '#F59E0B' : '#3B82F6',
           'line-width': lineWidth,
-          'line-opacity': mainOpacity
+          'line-opacity': mainOpacity,
+          'line-blur': isOpponent ? 0.5 : 0,
+          'line-offset': isOpponent ? 8 : -8,
+          'line-gap-width': 2
         }
       });
       
@@ -140,7 +143,9 @@ const MapboxRouteLayer: React.FC<MapboxRouteLayerProps> = ({
           'line-color': isRat ? '#FCD34D' : '#93C5FD',
           'line-width': glowWidth,
           'line-opacity': glowOpacity,
-          'line-blur': 3
+          'line-blur': 2,
+          'line-offset': isOpponent ? 8 : -8,
+          'line-gap-width': 2
         }
       });
       

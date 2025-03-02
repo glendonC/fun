@@ -21,10 +21,34 @@ import {
   RaceParameters
 } from '../';
 
+// Add this import
+import { RacerPosition } from '../types';
+
 interface RaceVisualizationProps {
   modelId: string;
   parameters: any;
   onBack: () => void;
+}
+
+interface UseAbilitiesProps {
+  modelId: string;
+  isRacing: boolean;
+  setCurrentSpeed: (speed: number) => void;
+  setOpponentSpeed: (speed: number) => void;
+  currentSpeed: number;
+  opponentSpeed: number;
+  racerPosition: RacerPosition;
+  opponentPosition: RacerPosition;
+  routeProgress: number;
+  opponentRouteProgress: number;
+  selectedRoute: number[][];
+  opponentRoute: number[][];
+  interpolatePosition: (progress: number) => RacerPosition;
+  setRacerPosition: (position: RacerPosition) => void;
+  setOpponentPosition: (position: RacerPosition) => void;
+  setRouteProgress: (progress: number) => void;
+  setOpponentRouteProgress: (progress: number) => void;
+  triggerReroute: () => void;
 }
 
 const RaceVisualization: React.FC<RaceVisualizationProps> = ({ modelId, parameters, onBack }) => {

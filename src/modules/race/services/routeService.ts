@@ -2,11 +2,10 @@ import { generateContent } from './aiModels';
 import { generateRouteVariations } from './mapboxService';
 import { RoutePoint, RouteVariation, GeoPoint } from '../types';
 
-// San Francisco coordinates - fixed start and end points
-// Start point at Union Square in San Francisco
+// Start point moved to Golden Gate Park (much further west)
 const START_POINT: GeoPoint = {
-  longitude: -122.4074,
-  latitude: 37.7879,
+  longitude: -122.4724, // About 3 miles west of previous position
+  latitude: 37.7704,    // Slightly south to create more interesting route options
   altitude: 0
 };
 
