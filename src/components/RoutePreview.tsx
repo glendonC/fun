@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { getFixedPoints } from '../services/routeService';
+import { getFixedPoints } from '../modules/race/services/routeService';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 // This is a public token for development purposes

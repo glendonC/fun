@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Zap, Brain, Database, Scale, Layers, Users, Gauge, RefreshCw, Loader, MapPin } from 'lucide-react';
 import PerformanceChart from './PerformanceChart';
-import { selectRouteWithAI } from '../services/routeService';
+import { selectRouteWithAI } from '../modules/race/services/routeService';
 import RoutePreview from './RoutePreview';
 
 interface TuningPageProps {
