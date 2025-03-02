@@ -11,8 +11,8 @@ export interface RoutePoint {
 // San Francisco coordinates - fixed start and end points
 // Start point at Union Square in San Francisco
 const START_POINT = {
-  longitude: -122.4074,
-  latitude: 37.7879,
+  longitude: -122.4724,
+  latitude: 37.7704,
   altitude: 0
 };
 

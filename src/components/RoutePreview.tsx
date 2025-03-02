@@ -48,6 +48,8 @@ const RoutePreview: React.FC<RoutePreviewProps> = ({ route, modelId }) => {
         ? route.map(point => [point[0], point[1]]) // Handle array format
         : route.map(point => [point.longitude, point.latitude]); // Handle object format
       
+      console.log('Route Preview Coordinates:', coordinates);
+      
       // Add route source
       map.addSource('route', {
         type: 'geojson',

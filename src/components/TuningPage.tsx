@@ -80,6 +80,11 @@ const TuningPage: React.FC<TuningPageProps> = ({ modelId, onBack, onStartRace, s
       setIsRouteLoading(true);
       try {
         const result = await selectRouteWithAI(modelId, { performance });
+        console.log('Selected Route:', {
+          points: result.selectedRoute,
+          name: result.routeName,
+          explanation: result.routeExplanation
+        });
         setSelectedRoute(result.selectedRoute);
         setRouteName(result.routeName);
         setRouteExplanation(result.routeExplanation);
