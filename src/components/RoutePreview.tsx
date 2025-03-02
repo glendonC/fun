@@ -45,8 +45,8 @@ const RoutePreview: React.FC<RoutePreviewProps> = ({ route, modelId }) => {
       
       // Format route coordinates properly
       const coordinates = Array.isArray(route[0]) 
-        ? route.map(point => [point[0], point[1]]) // Handle array format
-        : route.map(point => [point.longitude, point.latitude]); // Handle object format
+        ? route.map(point => [point[0], point[1]] as [number, number]) 
+        : route.map(point => [point.longitude, point.latitude] as [number, number]);
       
       console.log('Route Preview Coordinates:', coordinates);
       
@@ -130,7 +130,7 @@ const RoutePreview: React.FC<RoutePreviewProps> = ({ route, modelId }) => {
         element: el,
         rotationAlignment: 'map'
       })
-      .setLngLat(coordinates[0])
+      .setLngLat(coordinates[0] as [number, number])
       .addTo(map);
       
       // Animate the line
@@ -183,7 +183,7 @@ const RoutePreview: React.FC<RoutePreviewProps> = ({ route, modelId }) => {
       // Fit map to route bounds with padding
       const bounds = coordinates.reduce((bounds, coord) => {
         return bounds.extend(coord as [number, number]);
-      }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+      }, new mapboxgl.LngLatBounds(coordinates[0] as [number, number], coordinates[0] as [number, number]));
       
       map.fitBounds(bounds, {
         padding: 40,

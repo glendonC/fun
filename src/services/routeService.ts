@@ -11,8 +11,8 @@ export interface RoutePoint {
 // San Francisco coordinates - fixed start and end points
 // Start point at Union Square in San Francisco
 const START_POINT = {
-  longitude: -122.4724,
-  latitude: 37.7704,
+  longitude: -122.4954, // Further west in Sunset District
+  latitude: 37.7604,    // Near Golden Gate Park
   altitude: 0
 };
 
@@ -58,36 +58,125 @@ const getRouteVariations = async (modelId: string): Promise<RouteVariation[]> =>
   }
 };
 
-// Fallback routes in case the Mapbox API fails
+// Update getFallbackRoutes to match the race module routes
 const getFallbackRoutes = (modelId: string): RouteVariation[] => {
   const isRat = modelId === 'dbrx';
-  
-  // Generate a simple straight-line route
-  const points: RoutePoint[] = [];
-  const steps = 15;
-  
-  for (let i = 0; i <= steps; i++) {
-    const fraction = i / steps;
-    const longitude = START_POINT.longitude + fraction * (FINISH_POINT.longitude - START_POINT.longitude);
-    const latitude = START_POINT.latitude + fraction * (FINISH_POINT.latitude - START_POINT.latitude);
-    
-    // For flying routes, add some altitude
-    const altitude = isRat ? 0 : Math.sin(fraction * Math.PI) * 50;
-    
-    points.push({ longitude, latitude, altitude });
-  }
-  
-  // Create a single fallback route variation
-  return [{
-    name: isRat ? 'Fallback Route' : 'Fallback Flight Path',
-    description: 'A simple path generated when API routes are unavailable.',
-    points,
+  const variations: RouteVariation[] = [];
+
+  // Direct route
+  variations.push({
+    name: isRat ? 'Direct Route' : 'Direct Flight Path',
+    description: isRat 
+      ? 'The most direct path to the NASDAQ building. Efficient but potentially challenging.'
+      : 'A direct aerial route flying straight to the NASDAQ building.',
+    points: generateSimpleRoute(START_POINT, FINISH_POINT),
     characteristics: {
-      efficiency: 50,
-      complexity: 50,
-      risk: 50
+      efficiency: 90,
+      complexity: 30,
+      risk: 40
     }
-  }];
+  });
+
+  // Chinatown route
+  const chinatownPoints = [
+    { longitude: -122.4059, latitude: 37.7957, altitude: 0 }, // Near Chinatown
+    { longitude: -122.4022, latitude: 37.7952, altitude: 0 }  // Another point in Chinatown
+  ];
+  variations.push({
+    name: isRat ? 'Chinatown Route' : 'Chinatown Flight Path',
+    description: 'A challenging path through Chinatown with many turns and decision points.',
+    points: generateSimpleRoute(START_POINT, FINISH_POINT, chinatownPoints),
+    characteristics: {
+      efficiency: 40,
+      complexity: 90,
+      risk: 70
+    }
+  });
+
+  // Financial District route
+  const financialPoints = [
+    { longitude: -122.4038, latitude: 37.7873, altitude: 0 }, // Union Square
+    { longitude: -122.4010, latitude: 37.7914, altitude: 0 }  // Financial District
+  ];
+  variations.push({
+    name: isRat ? 'Financial District Route' : 'Financial District Flight',
+    description: 'A scenic path through the Financial District with less traffic and complexity.',
+    points: generateSimpleRoute(START_POINT, FINISH_POINT, financialPoints),
+    characteristics: {
+      efficiency: 60,
+      complexity: 20,
+      risk: 20
+    }
+  });
+
+  // Risky route
+  const riskyPoints = [
+    { longitude: -122.4020, latitude: 37.7900, altitude: 0 }, // Narrow street
+    { longitude: -122.3980, latitude: 37.7920, altitude: 0 }  // Another narrow passage
+  ];
+  variations.push({
+    name: isRat ? 'Risky Shortcut' : 'Risky Shortcut Flight',
+    description: 'A potentially faster but riskier path with challenging terrain and narrow streets.',
+    points: generateSimpleRoute(START_POINT, FINISH_POINT, riskyPoints),
+    characteristics: {
+      efficiency: 80,
+      complexity: 50,
+      risk: 90
+    }
+  });
+
+  // Add the thermal riding path for flying routes
+  if (!isRat) {
+    const thermalPoints = [
+      { longitude: -122.4050, latitude: 37.7920, altitude: 0 },
+      { longitude: -122.3990, latitude: 37.7890, altitude: 0 }
+    ];
+    variations.push({
+      name: 'Thermal Riding Path',
+      description: 'A path that takes advantage of thermal updrafts between skyscrapers.',
+      points: generateSimpleRoute(START_POINT, FINISH_POINT, thermalPoints, true),
+      characteristics: {
+        efficiency: 80,
+        complexity: 60,
+        risk: 40
+      }
+    });
+  }
+
+  return variations;
+};
+
+// Helper function to generate route points through waypoints
+const generateSimpleRoute = (
+  start: RoutePoint, 
+  end: RoutePoint, 
+  waypoints: RoutePoint[] = [],
+  isThermal: boolean = false
+): RoutePoint[] => {
+  const allPoints = [start, ...waypoints, end];
+  const points: RoutePoint[] = [];
+  const steps = 10;
+
+  for (let i = 0; i < allPoints.length - 1; i++) {
+    const from = allPoints[i];
+    const to = allPoints[i + 1];
+    
+    for (let j = 0; j <= steps; j++) {
+      const fraction = j / steps;
+      const longitude = from.longitude + fraction * (to.longitude - from.longitude);
+      const latitude = from.latitude + fraction * (to.latitude - from.latitude);
+      
+      let altitude = 0;
+      if (isThermal) {
+        const phase = ((i * steps + j) / (steps * (allPoints.length - 1))) * Math.PI * 4;
+        altitude = 20 + (Math.sin(phase) + 1) / 2 * 50;
+      }
+      
+      points.push({ longitude, latitude, altitude });
+    }
+  }
+
+  return points;
 };
 
 // Function to select a route using AI
@@ -102,6 +191,12 @@ export const selectRouteWithAI = async (
   try {
     // Get route variations for this model
     const routeVariations = await getRouteVariations(modelId);
+    console.log('Available Route Variations:', routeVariations.map(r => ({
+      name: r.name,
+      description: r.description,
+      characteristics: r.characteristics,
+      pointCount: r.points.length
+    })));
     
     // Ensure parameters and performance exist, with defaults if not
     const performance = parameters?.performance || { speed: 50, accuracy: 50, adaptability: 50 };
@@ -146,6 +241,8 @@ EXPLANATION: [your brief explanation]`;
       
       if (routeNumberMatch) {
         const routeNumber = parseInt(routeNumberMatch[1].trim(), 10);
+        console.log('Selected Route Number:', routeNumber);
+        console.log('Available Routes:', routeVariations.length);
         const explanation = explanationMatch 
           ? explanationMatch[1].trim() 
           : 'Route selected based on racer characteristics.';

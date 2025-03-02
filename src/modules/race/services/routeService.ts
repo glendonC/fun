@@ -4,8 +4,8 @@ import { RoutePoint, RouteVariation, GeoPoint } from '../types';
 
 // Start point moved to Golden Gate Park (much further west)
 const START_POINT: GeoPoint = {
-  longitude: -122.4724, // About 3 miles west of previous position
-  latitude: 37.7704,    // Slightly south to create more interesting route options
+  longitude: -122.4954, // Further west in Sunset District
+  latitude: 37.7604,    // Near Golden Gate Park
   altitude: 0
 };
 

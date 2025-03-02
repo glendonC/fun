@@ -85,118 +85,84 @@ export const generateRouteVariations = async (
       }
     });
     
-    // Complex route (with multiple waypoints)
-    // Create waypoints that force the route through Chinatown
-    const complexWaypoints = [
-      { longitude: -122.4059, latitude: 37.7957, altitude: 0 }, // Near Chinatown
-      { longitude: -122.4022, latitude: 37.7952, altitude: 0 }  // Another point in Chinatown
+    // Chinatown route
+    const chinatownWaypoints = [
+      { longitude: -122.4074, latitude: 37.7947, altitude: 0 }, // Chinatown Gate
+      { longitude: -122.4055, latitude: 37.7957, altitude: 0 }  // Portsmouth Square
     ];
     
-    const complexRoute = await getMapboxRoute(startPoint, endPoint, complexWaypoints);
-    variations.push({
-      name: isFlying ? 'Chinatown Flight Path' : 'Chinatown Route',
-      description: isFlying
-        ? 'A challenging aerial path through Chinatown with many altitude changes and direction shifts.'
-        : 'A challenging path through Chinatown with many turns and decision points.',
-      points: isFlying 
-        ? addAltitudeVariation(complexRoute, 20, 80) 
-        : complexRoute,
-      characteristics: {
-        efficiency: 40,
-        complexity: 90,
-        risk: 70
-      }
-    });
-    
-    // Scenic route (with different waypoints)
-    // Create waypoints that route through Union Square and the Financial District
-    const scenicWaypoints = [
-      { longitude: -122.4038, latitude: 37.7873, altitude: 0 }, // Union Square
-      { longitude: -122.4010, latitude: 37.7914, altitude: 0 }  // Financial District
+    // Market Street route
+    const marketStreetWaypoints = [
+      { longitude: -122.4294, latitude: 37.7726, altitude: 0 }, // Castro Station
+      { longitude: -122.4124, latitude: 37.7835, altitude: 0 }, // Civic Center
+      { longitude: -122.3991, latitude: 37.7902, altitude: 0 }  // Montgomery Station
     ];
     
-    const scenicRoute = await getMapboxRoute(startPoint, endPoint, scenicWaypoints);
-    variations.push({
-      name: isFlying ? 'Financial District Flight' : 'Financial District Route',
-      description: isFlying
-        ? 'A scenic aerial route through the Financial District with beautiful views of skyscrapers.'
-        : 'A scenic path through the Financial District with less traffic and complexity.',
-      points: isFlying 
-        ? addAltitudeVariation(scenicRoute, 30, 60) 
-        : scenicRoute,
-      characteristics: {
-        efficiency: 60,
-        complexity: 20,
-        risk: 20
-      }
-    });
-    
-    // Risky route (shorter but potentially more challenging)
-    // Create waypoints that force a route through narrow streets
-    const riskyWaypoints = [
-      { longitude: -122.4020, latitude: 37.7900, altitude: 0 }, // Narrow street
-      { longitude: -122.3980, latitude: 37.7920, altitude: 0 }  // Another narrow passage
+    // Hayes Valley route
+    const hayesValleyWaypoints = [
+      { longitude: -122.4264, latitude: 37.7759, altitude: 0 }, // Hayes Valley
+      { longitude: -122.4169, latitude: 37.7811, altitude: 0 }, // Opera House
+      { longitude: -122.4037, latitude: 37.7873, altitude: 0 }  // Union Square
     ];
     
-    const riskyRoute = await getMapboxRoute(startPoint, endPoint, riskyWaypoints);
-    variations.push({
-      name: isFlying ? 'Risky Shortcut Flight' : 'Risky Shortcut',
-      description: isFlying
-        ? 'A potentially faster but riskier aerial path with rapid altitude changes between buildings.'
-        : 'A potentially faster but riskier path with challenging terrain and narrow streets.',
-      points: isFlying 
-        ? addAltitudeVariation(riskyRoute, 5, 100, true) 
-        : riskyRoute,
-      characteristics: {
-        efficiency: 80,
-        complexity: 50,
-        risk: 90
-      }
-    });
-    
-    // Balanced route
-    // Create waypoints that provide a balanced path
-    const balancedWaypoints = [
-      { longitude: -122.4010, latitude: 37.7900, altitude: 0 } // Midpoint
+    // Golden Gate Park scenic route
+    const parkWaypoints = [
+      { longitude: -122.4699, latitude: 37.7686, altitude: 0 }, // Golden Gate Park
+      { longitude: -122.4559, latitude: 37.7726, altitude: 0 }, // Haight Street
+      { longitude: -122.4169, latitude: 37.7811, altitude: 0 }  // City Hall area
     ];
     
-    const balancedRoute = await getMapboxRoute(startPoint, endPoint, balancedWaypoints);
-    variations.push({
-      name: isFlying ? 'Balanced Flight Path' : 'Balanced Route',
-      description: isFlying
-        ? 'A well-balanced aerial path with moderate altitude changes and efficiency to the NASDAQ building.'
-        : 'A well-balanced path with moderate efficiency and complexity to the NASDAQ building.',
-      points: isFlying 
-        ? addAltitudeVariation(balancedRoute, 15, 50) 
-        : balancedRoute,
-      characteristics: {
-        efficiency: 70,
-        complexity: 60,
-        risk: 50
-      }
-    });
+    // Generate routes with each set of waypoints
+    const routes = await Promise.all([
+      getMapboxRoute(startPoint, endPoint, chinatownWaypoints),
+      getMapboxRoute(startPoint, endPoint, marketStreetWaypoints),
+      getMapboxRoute(startPoint, endPoint, hayesValleyWaypoints),
+      getMapboxRoute(startPoint, endPoint, parkWaypoints)
+    ]);
     
-    // For flying routes, add one more specialized option
-    if (isFlying) {
-      // Thermal riding path (with altitude variations optimized for thermals)
-      // Create a completely different path for the thermal route
-      const thermalWaypoints = [
-        { longitude: -122.4050, latitude: 37.7920, altitude: 0 }, // Different path
-        { longitude: -122.3990, latitude: 37.7890, altitude: 0 }  // Another point
-      ];
-      
-      const thermalRoute = await getMapboxRoute(startPoint, endPoint, thermalWaypoints);
-      variations.push({
-        name: 'Thermal Riding Path',
-        description: 'A path that takes advantage of thermal updrafts between skyscrapers for efficient flying to the NASDAQ building.',
-        points: addAltitudeVariation(thermalRoute, 10, 70, false, true),
+    // Add routes to variations with appropriate characteristics
+    variations.push(
+      {
+        name: isFlying ? 'Chinatown Flight Path' : 'Chinatown Route',
+        description: 'A challenging path through Chinatown with many turns and cultural landmarks.',
+        points: isFlying ? addAltitudeVariation(routes[0], 20, 80) : routes[0],
         characteristics: {
-          efficiency: 80,
-          complexity: 60,
+          efficiency: 60,
+          complexity: 85,
+          risk: 70
+        }
+      },
+      {
+        name: isFlying ? 'Market Street Corridor' : 'Market Street Route',
+        description: 'Following the main artery of the city with predictable traffic patterns.',
+        points: isFlying ? addAltitudeVariation(routes[1], 30, 60) : routes[1],
+        characteristics: {
+          efficiency: 75,
+          complexity: 50,
           risk: 40
         }
-      });
-    }
+      },
+      {
+        name: isFlying ? 'Hayes Valley Traverse' : 'Hayes Valley Route',
+        description: 'A balanced route through diverse neighborhoods with moderate challenges.',
+        points: isFlying ? addAltitudeVariation(routes[2], 15, 50) : routes[2],
+        characteristics: {
+          efficiency: 70,
+          complexity: 65,
+          risk: 55
+        }
+      },
+      {
+        name: isFlying ? 'Park & Haight Flight' : 'Park & Haight Route',
+        description: 'A scenic route through Golden Gate Park and Haight Street.',
+        points: isFlying ? addAltitudeVariation(routes[3], 10, 70) : routes[3],
+        characteristics: {
+          efficiency: 50,
+          complexity: 75,
+          risk: 60
+        }
+      }
+    );
     
     return variations;
   } catch (error) {
